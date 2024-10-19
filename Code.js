@@ -1,17 +1,15 @@
+//Code.gs
 var cachedData = null;
 var lastFetchTime = null;
 var SPREADSHEET_ID = '1InVJQMOs2qqoxp1ovFVp_gQQFnzvFR5EKwRsC1xBiBg';
 var AUTHORIZED_USERS = ['ian.chen@aotter.net', 'cjay@aotter.net', 'coki.lu@aotter.net', 'john.chiu@aotter.net', 'phsu@aotter.net', 'robert.hsueh@aotter.net', 'smallmouth@aotter.net', 's6354@hotmail.com'];
 
-Logger.log('doGet started');
-Logger.log('Authorized Users: ' + JSON.stringify(AUTHORIZED_USERS));
-
 function doGet(e) {
   Logger.log('Authorized Users: ' + JSON.stringify(AUTHORIZED_USERS));
-
+  
   var user = 'Unknown';
   var errorMessage = '';
-
+  
   try {
     user = Session.getActiveUser().getEmail();
     Logger.log('User email retrieved: ' + user);
@@ -19,15 +17,15 @@ function doGet(e) {
     errorMessage = 'Error getting user email: ' + error.toString();
     Logger.log(errorMessage);
   }
-
+  
   var isAuthorized = AUTHORIZED_USERS.includes(user);
   Logger.log('Is user authorized: ' + isAuthorized);
-
+  
   if (isAuthorized) {
     Logger.log('Access granted. Returning main page.');
     return HtmlService.createHtmlOutputFromFile('Index')
-      .setTitle('DSP 監控系統，看串接狀況')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+        .setTitle('DSP 監控系統，看串接狀況')
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   } else {
     Logger.log('Access denied. Returning error page.');
     var output = HtmlService.createHtmlOutput(`
@@ -45,9 +43,9 @@ function doGet(e) {
         }
       </script>
     `)
-      .setTitle('訪問被拒絕')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-
+    .setTitle('訪問被拒絕')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    
     return output;
   }
 }
@@ -59,35 +57,45 @@ function checkManualAuth(email) {
   return isAuthorized;
 }
 
-function getPublishers(startIndex, batchSize) {
-  // Default batch size to 100 if not provided
-  batchSize = batchSize || 100;
-  startIndex = startIndex || 1;  // Skip the header row
+function getPublishers() {
+  if (cachedData && lastFetchTime && (new Date().getTime() - lastFetchTime < 60000)) {
+    return cachedData;
+  }
 
   try {
-    Logger.log('Fetching data from spreadsheet');
     var spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
     var sheet = spreadsheet.getSheetByName('Sheet1');
-    if (!sheet) {
-      Logger.log('Sheet1 not found in spreadsheet');
-      throw new Error('在指定的 spreadsheet 中找不到 Sheet1');
-    }
-    var data = sheet.getDataRange().getValues();
-    Logger.log('Data fetched');
+    if (!sheet) throw new Error('在指定的 spreadsheet 中找不到 Sheet1');
 
-    var headers = data[0];
-    var publishers = data.slice(startIndex, startIndex + batchSize).reduce(function (acc, row) {
-      var item = headers.reduce(function (obj, header, index) {
+    var data = sheet.getDataRange().getValues();
+
+    // Normalize headers (trim spaces and convert to lowercase)
+    var headers = data[0].map(function(header) {
+      return header.trim().toLowerCase();
+    });
+
+    // Get index for ads.txt status column
+    var adsTxtStatusIndex = headers.indexOf('ads.txt 設置狀況');
+    if (adsTxtStatusIndex === -1) {
+      throw new Error('找不到 "ads.txt 設置狀況" 列');
+    }
+    
+    // DSP columns (例如: CRITEO, FREAKOUTBANNER 等)
+    var dspColumns = ['criteo', 'freakoutbanner', 'smaatonative', 'ucfunnelnative', 'ucfunnelbanner', 'freakoutvastxml', 'smaatobanner'];
+
+    var publishers = data.slice(1).reduce(function(acc, row) {
+      var item = headers.reduce(function(obj, header, index) {
         obj[header] = row[index];
         return obj;
       }, {});
 
-      var orgId = item['orgId'];
-      var clientId = item['clientId'];
-      var placeUid = item['placeUid'];
+      var orgId = item['org id'];
+      var clientId = item['client id'];
+      var placeUid = item['place uid'];
 
       if (!acc[orgId]) {
         acc[orgId] = {
+          orgName: item['org name'],
           orgId: orgId,
           apps: {}
         };
@@ -95,6 +103,7 @@ function getPublishers(startIndex, batchSize) {
 
       if (!acc[orgId].apps[clientId]) {
         acc[orgId].apps[clientId] = {
+          appName: item['app name'],
           clientId: clientId,
           platform: item['platform'],
           places: {}
@@ -102,38 +111,66 @@ function getPublishers(startIndex, batchSize) {
       }
 
       if (!acc[orgId].apps[clientId].places[placeUid]) {
-        var adsTxtSetupStatus = item['ads.txt 設置狀況'];  // Assuming this is the column header for AA
+        // 檢查 ads.txt 狀態
+        var adsTxtStatus = item['ads.txt 設置狀況'] || '';
+        var adsTxtLines = adsTxtStatus.split('\n');
+        var hasAsealSellerJson = adsTxtLines.some(line => line.includes('aseal 正確設置'));
+        var hasTeadsSellerJson = adsTxtLines.some(line => line.includes('teads 正確設置'));
+        var hasUcfunnelSellerJson = adsTxtLines.some(line => line.includes('ucfunnel 正確設置'));
+        var hasSmaatoSellerJson = adsTxtLines.some(line => line.includes('smaato 正確設置'));
+
+        // 列出所有 DSP 項目並檢查串接狀況
+        var dspSettingList = dspColumns.map(function(dspName) {
+          var status = 'not_connected'; // 預設為未串接
+
+          // 確認該 DSP 的狀態是否是有效的
+          if (item[dspName]) {
+            var dspStatus = item[dspName].trim().toLowerCase();
+            if (dspStatus === '✓' || dspStatus === 'connected') { // 檢查 '✓' 或其他可能的標記
+              status = 'normal';
+            } else if (dspStatus === 'paused') {
+              status = 'paused';
+            } else if (dspStatus === 'abnormal') {
+              status = 'abnormal';
+            }
+          }
+
+          return {
+            dspName: dspName.toUpperCase(),
+            status: status,
+            fillRate: item[dspName + ' fill rate'] || 0
+          };
+        });
+
+        // 根據 compatibilityMap 標註 DSPs 是否兼容，但不過濾
+        const compatibleDsps = getCompatibleDsps(item['platform'], item['place type'], `${item['width']}x${item['height']}`);
+
+        dspSettingList = dspSettingList.filter(dsp => compatibleDsps.includes(dsp.dspName)); // 只保留兼容的 DSP
 
         acc[orgId].apps[clientId].places[placeUid] = {
           place: item['place'],
           placeType: item['place type'],
           placeUid: placeUid,
+          width: item['width'] || 'N/A',
+          height: item['height'] || 'N/A',
           size: (item['width'] && item['height']) ? item['width'] + 'x' + item['height'] : 'N/A',
           request: item['request'] || '0',
-          adsTxtSetupStatus: adsTxtSetupStatus  // Include the ads.txt setup status
+          dspSettingList: dspSettingList,
+          hasAsealSellerJson: hasAsealSellerJson,
+          hasTeadsSellerJson: hasTeadsSellerJson,
+          hasUcfunnelSellerJson: hasUcfunnelSellerJson,
+          hasSmaatoSellerJson: hasSmaatoSellerJson
         };
-
-        var dspStatus = {};
-        var dspColumns = ['CRITEO', 'FREAKOUTBANNER', 'SMAATONATIVE', 'UCFUNNELNATIVE', 'UCFUNNELBANNER', 'FREAKOUTVASTXML', 'SMAATOBANNER'];
-        dspColumns.forEach(function (dsp) {
-          var index = headers.indexOf(dsp);
-          if (index !== -1) {
-            dspStatus[dsp] = row[index] === '✓' ? '正常' : '未串接';
-          }
-        });
-
-        acc[orgId].apps[clientId].places[placeUid].dspStatus = dspStatus;
       }
       return acc;
     }, {});
 
-    cachedData = publishers;
+    var result = { publishers: Object.values(publishers) };
+
+    cachedData = result;
     lastFetchTime = new Date().getTime();
 
-    return {
-      publishers: Object.values(publishers),
-      nextStartIndex: startIndex + batchSize < data.length ? startIndex + batchSize : null  // Return next batch start index if available
-    };
+    return result;
   } catch (error) {
     Logger.log('Error in getPublishers: ' + error.toString());
     throw new Error('獲取發布商數據失敗: ' + error.message);
@@ -142,40 +179,39 @@ function getPublishers(startIndex, batchSize) {
 
 // 定義 getCompatibleDsps 函數
 function getCompatibleDsps(platform, placeType, size) {
-  const compatibilityMap = {
-    IOS: {
-      NATIVE: ["CRITEO", "SMAATONATIVE", "UCFUNNELNATIVE"],
-      BANNER: {
-        "320x50": ["FREAKOUTBANNER", "UCFUNNELBANNER"],
-        "300x250": ["UCFUNNELBANNER"],
-      },
-      SUPR_AD: {
-        "1200x628": ["FREAKOUTBANNER", "SMAATONATIVE", "UCFUNNELBANNER"],
-      },
+const compatibilityMap = {
+  IOS: {
+    NATIVE: ["CRITEO", "SMAATONATIVE", "UCFUNNELNATIVE"],
+    BANNER: {
+      "320x50": ["FREAKOUTBANNER", "UCFUNNELBANNER"],
+      "300x250": ["UCFUNNELBANNER"],
     },
-    WEB: {
-      NATIVE: ["UCFUNNELNATIVE"],
-      BANNER: {
-        "320x50": ["CRITEO", "UCFUNNELBANNER"],
-        "300x250": ["CRITEO", "UCFUNNELBANNER"],
-      },
-      SUPR_AD: {
-        "336x280": ["FREAKOUTBANNER", "CRITEO"],
-        "300x250": ["FREAKOUTBANNER", "CRITEO", "UCFUNNELBANNER"],
-      },
+    SUPR_AD: {
+      "1200x628": ["FREAKOUTBANNER", "SMAATONATIVE", "UCFUNNELBANNER"],
     },
-    ANDROID: {  // 新增 Android 平台的 DSP 配置
-      NATIVE: ["CRITEO", "SMAATONATIVE", "UCFUNNELNATIVE"],
-      BANNER: {
-        "320x50": ["FREAKOUTBANNER", "UCFUNNELBANNER"],
-        "300x250": ["UCFUNNELBANNER"],
-      },
-      SUPR_AD: {
-        "1200x628": ["FREAKOUTBANNER", "SMAATONATIVE", "UCFUNNELBANNER"],
-      },
-    }
-  };
-
+  },
+  WEB: {
+    NATIVE: ["UCFUNNELNATIVE"],
+    BANNER: {
+      "320x50": ["CRITEO", "UCFUNNELBANNER"],
+      "300x250": ["CRITEO", "UCFUNNELBANNER"],
+    },
+    SUPR_AD: {
+      "336x280": ["FREAKOUTBANNER", "CRITEO"],
+      "300x250": ["FREAKOUTBANNER", "CRITEO", "UCFUNNELBANNER"],
+    },
+  },
+  ANDROID: {
+    NATIVE: ["CRITEO", "SMAATONATIVE", "UCFUNNELNATIVE"],
+    BANNER: {
+      "320x50": ["FREAKOUTBANNER", "UCFUNNELBANNER"],
+      "300x250": ["UCFUNNELBANNER"],
+    },
+    SUPR_AD: {
+      "1200x628": ["FREAKOUTBANNER", "SMAATONATIVE", "UCFUNNELBANNER"],
+    },
+  }
+};
 
   // 根據 platform 和 placeType 選擇符合的 DSPs
   if (!platform || !compatibilityMap[platform]) return [];

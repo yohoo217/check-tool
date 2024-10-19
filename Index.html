@@ -1,457 +1,540 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Publisher List</title>
+    <link
+      href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Publisher List</title>
-  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
-</head>
-
-<body>
-  <div id="app" class="p-6 bg-gray-100 min-h-screen">
-    <!-- Filters -->
-    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-      <h2 class="text-xl font-semibold mb-4">篩選</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-        <select id="platform" class="w-full p-2 border rounded-md bg-white">
-          <option value="">請選擇平台</option>
-          <option value="IOS">IOS</option>
-          <option value="ANDROID">ANDROID</option>
-          <option value="WEB">WEB</option>
-        </select>
-        <select id="placeType" class="w-full p-2 border rounded-md bg-white">
-          <option value="">請選擇版位類型</option>
-          <option value="NATIVE">NATIVE</option>
-          <option value="BANNER">BANNER</option>
-          <option value="SUPR_AD">SUPR_AD</option>
-        </select>
-        <select id="dspStatus" class="w-full p-2 border rounded-md bg-white">
-          <option value="">請選擇串接狀態</option>
-          <option value="normal">正常</option>
-          <option value="abnormal">連線異常</option>
-          <option value="not_connected">尚未串接</option>
-          <option value="paused">暫停</option>
-        </select>
-        <select id="showEmptyDsps" class="w-full p-2 border rounded-md bg-white">
-          <option value="">請選擇廣告版位</option>
-          <option value="with">有 DSP</option>
-          <option value="without">無 DSP</option>
-        </select>
-        <select id="size" class="w-full p-2 border rounded-md bg-white">
-          <option value="">請選擇尺寸</option>
-          <option value="320x50">320x50</option>
-          <option value="300x250">300x250</option>
-          <option value="1200x628">1200x628</option>
-          <option value="336x280">336x280</option>
-        </select>
-        <select id="dspName" class="w-full p-2 border rounded-md bg-white">
-          <option value="">請選擇 DSP</option>
-          <option value="CRITEO">CRITEO</option>
-          <option value="SMAATONATIVE">SMAATONATIVE</option>
-          <option value="UCFUNNELNATIVE">UCFUNNELNATIVE</option>
-          <option value="FREAKOUTBANNER">FREAKOUTBANNER</option>
-          <option value="UCFUNNELBANNER">UCFUNNELBANNER</option>
-        </select>
-        <select id="request" class="w-full p-2 border rounded-md bg-white">
-          <option value="">所有 Request</option>
-          <option value="0">Request = 0</option>
-          <option value="non-zero">Request > 0</option>
-        </select>
+  <body>
+    <div id="app" class="p-6 bg-gray-100 min-h-screen">
+      <!-- Filters -->
+      <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h2 class="text-xl font-semibold mb-4">篩選</h2>
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+        >
+          <select id="platform" class="w-full p-2 border rounded-md bg-white">
+            <option value="">請選擇平台</option>
+            <option value="IOS">IOS</option>
+            <option value="ANDROID">ANDROID</option>
+            <option value="WEB">WEB</option>
+          </select>
+          <select id="placeType" class="w-full p-2 border rounded-md bg-white">
+            <option value="">請選擇版位類型</option>
+            <option value="NATIVE">NATIVE</option>
+            <option value="BANNER">BANNER</option>
+            <option value="SUPR_AD">SUPR_AD</option>
+          </select>
+          <select id="dspStatus" class="w-full p-2 border rounded-md bg-white">
+            <option value="">請選擇串接狀態</option>
+            <option value="normal">正常</option>
+            <option value="abnormal">連線異常</option>
+            <option value="not_connected">尚未串接</option>
+            <option value="paused">暫停</option>
+          </select>
+          <select
+            id="showEmptyDsps"
+            class="w-full p-2 border rounded-md bg-white"
+          >
+            <option value="">請選擇廣告版位</option>
+            <option value="with">有 DSP</option>
+            <option value="without">無 DSP</option>
+          </select>
+          <select id="size" class="w-full p-2 border rounded-md bg-white">
+            <option value="">請選擇尺寸</option>
+            <option value="320x50">320x50</option>
+            <option value="300x250">300x250</option>
+            <option value="1200x628">1200x628</option>
+            <option value="336x280">336x280</option>
+          </select>
+          <select id="dspName" class="w-full p-2 border rounded-md bg-white">
+            <option value="">請選擇 DSP</option>
+            <option value="CRITEO">CRITEO</option>
+            <option value="SMAATONATIVE">SMAATONATIVE</option>
+            <option value="UCFUNNELNATIVE">UCFUNNELNATIVE</option>
+            <option value="FREAKOUTBANNER">FREAKOUTBANNER</option>
+            <option value="UCFUNNELBANNER">UCFUNNELBANNER</option>
+          </select>
+          <select id="request" class="w-full p-2 border rounded-md bg-white">
+            <option value="">所有 Request</option>
+            <option value="0">Request = 0</option>
+            <option value="non-zero">Request > 0</option>
+          </select>
+        </div>
       </div>
-    </div>
 
-    <!-- Publishers List -->
-    <div id="publishersList"></div>
+      <!-- Publishers List -->
+      <div id="publishersList"></div>
 
-    <!-- DSP Edit Modal -->
-    <div id="dspModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-      <div class="bg-white p-6 rounded-lg">
-        <h2 class="text-xl font-bold mb-4">編輯 DSP</h2>
-        <div id="dspEditContent"></div>
-        <div class="mt-4 flex justify-end">
-          <!-- 取消按鈕 -->
-          <button id="cancelEdit" class="bg-gray-300 text-black px-4 py-2 rounded mr-2" onclick="handleCancelEdit()">取消</button>
-          <!-- 確定按鈕 -->
-          <button id="saveEdit" class="bg-blue-500 text-white px-4 py-2 rounded" onclick="handleSaveDsps()">確定</button>
+      <!-- DSP Edit Modal -->
+      <div
+        id="dspModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
+      >
+        <div class="bg-white p-6 rounded-lg">
+          <h2 class="text-xl font-bold mb-4">編輯 DSP</h2>
+          <div id="dspEditContent"></div>
+          <div class="mt-4 flex justify-end">
+            <button
+              id="cancelEdit"
+              class="bg-gray-300 text-black px-4 py-2 rounded mr-2"
+            >
+              取消
+            </button>
+            <button
+              id="saveEdit"
+              class="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              確定
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <script>
-    let publishers = [];
-    let editingPlace = null;
+    <script>
+      let publishers = [];
+      let editingPlace = null;
 
-    const compatibilityMap = {
-      IOS: {
-        NATIVE: ["CRITEO", "SMAATONATIVE", "UCFUNNELNATIVE"],
-        BANNER: {
-          "320x50": ["FREAKOUTBANNER", "UCFUNNELBANNER"],
-          "300x250": ["UCFUNNELBANNER"],
+      const compatibilityMap = {
+        IOS: {
+          NATIVE: ["CRITEO", "SMAATONATIVE", "UCFUNNELNATIVE"],
+          BANNER: {
+            "320x50": ["FREAKOUTBANNER", "UCFUNNELBANNER"],
+            "300x250": ["UCFUNNELBANNER"],
+          },
+          SUPR_AD: {
+            "1200x628": ["FREAKOUTBANNER", "SMAATONATIVE", "UCFUNNELBANNER"],
+          },
         },
-        SUPR_AD: {
-          "1200x628": ["FREAKOUTBANNER", "SMAATONATIVE", "UCFUNNELBANNER"],
+        WEB: {
+          NATIVE: ["UCFUNNELNATIVE"],
+          BANNER: {
+            "320x50": ["CRITEO", "UCFUNNELBANNER"],
+            "300x250": ["CRITEO", "UCFUNNELBANNER"],
+          },
+          SUPR_AD: {
+            "336x280": ["FREAKOUTBANNER", "CRITEO"],
+            "300x250": ["FREAKOUTBANNER", "CRITEO", "UCFUNNELBANNER"],
+          },
         },
-      },
-      WEB: {
-        NATIVE: ["UCFUNNELNATIVE"],
-        BANNER: {
-          "320x50": ["CRITEO", "UCFUNNELBANNER"],
-          "300x250": ["CRITEO", "UCFUNNELBANNER"],
+        ANDROID: {
+          NATIVE: ["CRITEO", "SMAATONATIVE", "UCFUNNELNATIVE"],
+          BANNER: {
+            "320x50": ["FREAKOUTBANNER", "UCFUNNELBANNER"],
+            "300x250": ["UCFUNNELBANNER"],
+          },
+          SUPR_AD: {
+            "1200x628": ["FREAKOUTBANNER", "SMAATONATIVE", "UCFUNNELBANNER"],
+          },
         },
-        SUPR_AD: {
-          "336x280": ["FREAKOUTBANNER", "CRITEO"],
-          "300x250": ["FREAKOUTBANNER", "CRITEO", "UCFUNNELBANNER"],
-        },
-      },
-  ANDROID: {  // 新增 Android 平台的 DSP 配置
-    NATIVE: ["CRITEO", "SMAATONATIVE", "UCFUNNELNATIVE"],
-    BANNER: {
-      "320x50": ["FREAKOUTBANNER", "UCFUNNELBANNER"],
-      "300x250": ["UCFUNNELBANNER"],
-    },
-    SUPR_AD: {
-      "1200x628": ["FREAKOUTBANNER", "SMAATONATIVE", "UCFUNNELBANNER"],
-    },
-  }
-    };
+      };
 
-    // Get compatible DSPs based on platform, place type, and size
-    function getCompatibleDsps(platform, placeType, size) {
-      if (!platform || !compatibilityMap[platform]) return [];
-      const platformMap = compatibilityMap[platform];
-      if (!platformMap[placeType]) return [];
-      if (Array.isArray(platformMap[placeType])) return platformMap[placeType];
-      if (size && platformMap[placeType][size]) return platformMap[placeType][size];
-      return Object.values(platformMap[placeType]).flat();
-    }
-
-    // Fetch publishers from Google Apps Script backend
-    function fetchPublishers() {
-      const publishersList = document.getElementById('publishersList');
-      publishersList.innerHTML = '<p class="text-center p-4">載入中...</p>';
-      google.script.run
-        .withSuccessHandler(handleFetchSuccess)
-        .withFailureHandler(handleFetchError)
-        .getPublishers();
-    }
-
-    // Handle success response from fetchPublishers
-function handleFetchSuccess(data) {
-  if (data && data.publishers && Array.isArray(data.publishers)) {
-    publishers = data.publishers.map(publisher => ({
-      ...publisher,
-      apps: publisher.apps ? Object.fromEntries(
-        Object.entries(publisher.apps).map(([clientId, app]) => [
-          clientId,
-          {
-            ...app,
-            places: app.places ? Object.fromEntries(
-              Object.entries(app.places).map(([placeUid, place]) => {
-                // 使用 getCompatibleDsps 獲取與 place 匹配的 DSPs
-                const compatibleDsps = getCompatibleDsps(app.platform, place.placeType, place.size);
-
-                // 遍歷原始的 dspSettingList，保留已有的 DSP 狀態
-                const updatedDspList = (place.dspSettingList || []).map(dsp => {
-                  // 如果該 DSP 也存在於 compatibilityMap，保留其狀態
-                  if (compatibleDsps.includes(dsp.dspName)) {
-                    return dsp; // 保留已有的狀態
-                  }
-                  // 如果不匹配 compatibilityMap，仍然保留但設為 'not_connected'
-                  return { ...dsp, status: 'not_connected' };
-                });
-
-                // 為尚未出現的 compatible DSPs 添加 'not_connected' 狀態
-                compatibleDsps.forEach(dspName => {
-                  if (!updatedDspList.some(dsp => dsp.dspName === dspName)) {
-                    updatedDspList.push({ dspName, status: 'not_connected', fillRate: 0 });
-                  }
-                });
-
-                return [placeUid, { ...place, dspSettingList: updatedDspList }];
-              }) // Close the map function for places
-            ) : {} // Add else case for places
-          }
-        ]) // Close the map function for apps
-      ) : {} // Add else case for apps
-    }));
-    renderPublishers();
-  } else {
-    console.error('publishers array is missing or not an array');
-  }
-}
-
-
-    // Handle error response
-    function handleFetchError(error) {
-      const publishersList = document.getElementById('publishersList');
-      publishersList.innerHTML = `<p class="text-center p-4 text-red-500">錯誤: ${error}</p>`;
-    }
-
-    function handleCancelEdit() {
-      toggleDspModal(false);  // 關閉 modal 視窗
-    }
-
-    // Render publishers list
-    function renderPublishers() {
-      const publishersList = document.getElementById('publishersList');
-      const filteredPublishers = filterPublishers();
-      if (filteredPublishers.length === 0) {
-        publishersList.innerHTML = '<p class="text-center p-4">沒有符合條件的發布商</p>';
-        return;
+      // Get compatible DSPs based on platform, place type, and size
+      function getCompatibleDsps(platform, placeType, size) {
+        if (!platform || !compatibilityMap[platform]) return [];
+        const platformMap = compatibilityMap[platform];
+        if (!platformMap[placeType]) return [];
+        if (Array.isArray(platformMap[placeType]))
+          return platformMap[placeType];
+        if (size && platformMap[placeType][size])
+          return platformMap[placeType][size];
+        return Object.values(platformMap[placeType]).flat();
       }
-      publishersList.innerHTML = filteredPublishers.map(publisher => `
+
+      // Fetch publishers from Google Apps Script backend
+      function fetchPublishers() {
+        const publishersList = document.getElementById("publishersList");
+        publishersList.innerHTML = '<p class="text-center p-4">載入中...</p>';
+        google.script.run
+          .withSuccessHandler(handleFetchSuccess)
+          .withFailureHandler(handleFetchError)
+          .getPublishers();
+      }
+
+      // Handle success response from fetchPublishers
+      function handleFetchSuccess(data) {
+        if (data && Array.isArray(data.publishers)) {
+          publishers = data.publishers.map((publisher) => ({
+            ...publisher,
+            apps: Object.fromEntries(
+              Object.entries(publisher.apps).map(([clientId, app]) => [
+                clientId,
+                {
+                  ...app,
+                  places: Object.fromEntries(
+                    Object.entries(app.places).map(([placeUid, place]) => {
+                      // 使用 getCompatibleDsps 獲取與 place 匹配的 DSPs
+                      const compatibleDsps = getCompatibleDsps(
+                        app.platform,
+                        place.placeType,
+                        place.size
+                      );
+
+                      // 遍歷原始的 dspSettingList，保留已有的 DSP 狀態
+                      const updatedDspList = place.dspSettingList
+                        .map((dsp) => {
+                          if (compatibleDsps.includes(dsp.dspName)) {
+                            return dsp; // 保留已有的狀態
+                          }
+                          return null; // 不顯示不兼容的 DSP
+                        })
+                        .filter(Boolean); // 過濾掉 null
+
+                      // 為尚未出現的 compatible DSPs 添加 'not_connected' 狀態
+                      compatibleDsps.forEach((dspName) => {
+                        if (
+                          !updatedDspList.some((dsp) => dsp.dspName === dspName)
+                        ) {
+                          updatedDspList.push({
+                            dspName,
+                            status: "not_connected",
+                            fillRate: 0,
+                          });
+                        }
+                      });
+
+                      return [
+                        placeUid,
+                        { ...place, dspSettingList: updatedDspList },
+                      ];
+                    })
+                  ),
+                },
+              ])
+            ),
+          }));
+          renderPublishers();
+        } else {
+          handleFetchError("Invalid data structure received from the server");
+        }
+      }
+
+      // Handle error response
+      function handleFetchError(error) {
+        const publishersList = document.getElementById("publishersList");
+        publishersList.innerHTML = `<p class="text-center p-4 text-red-500">錯誤: ${error}</p>`;
+      }
+
+      // Render publishers list
+      function renderPublishers() {
+        const publishersList = document.getElementById("publishersList");
+        const filteredPublishers = filterPublishers();
+        if (filteredPublishers.length === 0) {
+          publishersList.innerHTML =
+            '<p class="text-center p-4">沒有符合條件的發布商</p>';
+          return;
+        }
+        publishersList.innerHTML = filteredPublishers
+          .map(
+            (publisher) => `
         <div class="mb-6 rounded-lg shadow-md overflow-hidden">
           <div class="p-4 bg-blue-50 font-bold border-b border-blue-200 flex justify-between items-center cursor-pointer">
             ${publisher.orgName}
-            <span class="ml-4 text-gray-500 font-normal">Org ID: ${publisher.orgId}</span>
+            <span class="ml-4 text-gray-500 font-normal">Org ID: ${
+              publisher.orgId
+            }</span>
           </div>
           ${renderApps(publisher.apps, publisher.orgId)}
         </div>
-      `).join('');
-    }
+      `
+          )
+          .join("");
+      }
 
-    // Render applications associated with the publisher
-    function renderApps(apps, orgId) {
-      return Object.entries(apps).map(([clientId, app]) => `
+      // Render applications associated with the publisher
+      function renderApps(apps, orgId) {
+        return Object.entries(apps)
+          .map(
+            ([clientId, app]) => `
         <div class="p-3 bg-gray-200 font-semibold border-b border-gray-300 flex justify-between items-center cursor-pointer">
           <div>${app.appName}</div>
           <span class="ml-4 text-gray-600 font-normal">Client ID: ${clientId}</span>
-          <span class="ml-4 text-gray-600 font-normal">Platform: ${app.platform}</span>
+          <span class="ml-4 text-gray-600 font-normal">Platform: ${
+            app.platform
+          }</span>
         </div>
         <table class="w-full bg-white">
-          <thead>
-            <tr class="bg-gray-50">
-              <th class="p-2 text-left pl-4">廣告版位</th>
-              <th class="p-2 text-left">版位類型</th>
-              <th class="p-2 text-left">版位 UID</th>
-              <th class="p-2 text-left">尺寸</th>
-              <th class="p-2 text-left">DSP</th>
-              <th class="p-2 text-left">請求數</th>
-              <th class="p-2 text-left">填充率</th>
-              <th class="p-2 text-left">ads.txt 狀態</th>
-              <th class="p-2 text-left">操作</th>
-            </tr>
-          </thead>
+<thead>
+  <tr class="bg-gray-50">
+    <th class="p-2 text-left pl-4">廣告版位</th>
+    <th class="p-2 text-left">版位類型</th>
+    <th class="p-2 text-left">版位 UID</th>
+    <th class="p-2 text-left">尺寸</th>
+    <th class="p-2 text-left">DSP</th>
+    <th class="p-2 text-left">請求數</th>
+    <th class="p-2 text-left">填充率</th>
+    <th class="p-2 text-left">ads.txt 狀態</th>
+    <th class="p-2 text-left">操作</th>
+  </tr>
+</thead>
           <tbody>
             ${renderPlaces(app.places, orgId, clientId)}
           </tbody>
         </table>
-      `).join('');
-    }
+      `
+          )
+          .join("");
+      }
 
-// Render places within the app
-function renderPlaces(places, orgId, clientId) {
-  return Object.entries(places).map(([placeUid, place]) => `
-    <tr class="border-t border-gray-100">
-      <td class="p-2 pl-4">${place.place}</td>
-      <td class="p-2">${place.placeType}</td>
-      <td class="p-2">${placeUid}</td>
-      <td class="p-2">${place.size || "N/A"}</td>
-      <td class="p-2">${renderDspList(place.dspSettingList)}</td>
-      <td class="p-2">${place.request}</td>
-      <td class="p-2">${place.dspSettingList.map(dsp => `${(parseFloat(dsp.fillRate) * 100).toFixed(2)}%`).join('<br>')}</td>
-      <td class="p-2">${formatAdsTxtStatus(place.adsTxtSetupStatus)}</td>
-      <td class="p-2">
-        <button class="bg-blue-500 text-white px-4 py-2 rounded" onclick="handleEditClick('${placeUid}', '${orgId}', '${clientId}')">編輯</button>
-      </td>  <!-- 恢復編輯按鈕 -->
-    </tr>
-  `).join('');
-}
+      // Render places within the app
+      function renderPlaces(places, orgId, clientId) {
+        return Object.entries(places)
+          .map(
+            ([placeUid, place]) => `
+        <tr class="border-t border-gray-100">
+          <td class="p-2 pl-4">${place.place}</td>
+          <td class="p-2">${place.placeType}</td>
+          <td class="p-2">${placeUid}</td>
+          <td class="p-2">${place.size || "N/A"}</td>
+          <td class="p-2">${renderDspList(place.dspSettingList)}</td>
+          <td class="p-2">${place.request}</td>
+          <td class="p-2">${place.dspSettingList
+            .map((dsp) => `${(parseFloat(dsp.fillRate) * 100).toFixed(2)}%`)
+            .join("<br>")}</td>
+          <td class="p-2">
+  ${
+    place.hasAsealSellerJson
+      ? '<span class="text-green-500">Aseal 設置正確</span>'
+      : '<span class="text-red-500">Aseal 未設置</span>'
+  }<br>
+  ${
+    place.hasTeadsSellerJson
+      ? '<span class="text-green-500">Teads 設置正確</span>'
+      : '<span class="text-red-500">Teads 未設置</span>'
+  }<br>
+  ${
+    place.hasUcfunnelSellerJson
+      ? '<span class="text-green-500">Ucfunnel 設置正確</span>'
+      : '<span class="text-red-500">Ucfunnel 未設置</span>'
+  }<br>
+  ${
+    place.hasSmaatoSellerJson
+      ? '<span class="text-green-500">Smaato 設置正確</span>'
+      : '<span class="text-red-500">Smaato 未設置</span>'
+  }
 
+          </td>
+          <td class="p-2">
+            <button onclick="handleEditClick('${placeUid}', '${orgId}', '${clientId}')" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+              編輯
+            </button>
+          </td>
+        </tr>
+      `
+          )
+          .join("");
+      }
 
-function formatAdsTxtStatus(status) {
-  if (!status) return '未設置';  // 預設為 "未設置" 如果狀態不存在
+      // Render DSP list
+      function renderDspList(dspSettingList) {
+        return dspSettingList
+          .map(
+            (dsp) => `
+        <div class="flex items-center">
+          <span class="${getDspStatusClass(dsp.status)} h-4 w-4 mr-1">●</span>
+          <span class="text-sm">${processDspName(dsp.dspName)}</span>
+          <span class="text-xs text-gray-500 ml-1">(${dspStatusLabel(
+            dsp.status
+          )})</span>
+        </div>
+      `
+          )
+          .join("");
+      }
 
-  // 將內容按照斷行符號分割
-  const lines = status.split('\n');
+      // Get DSP status class
+      function getDspStatusClass(status) {
+        const classes = {
+          normal: "text-green-500",
+          not_connected: "text-gray-500",
+          paused: "text-yellow-500",
+          abnormal: "text-red-500",
+        };
+        return classes[status] || "text-gray-500";
+      }
 
-  // 根據內容動態設定顏色
-  return lines.map(line => {
-    if (line.includes('未設置')) {
-      return `<span style="color: red;">${line}</span>`;  // 如果包含 "未設置"，顯示為紅色
-    } else if (line.includes('正確設置')) {
-      return `<span style="color: green;">${line}</span>`;  // 如果包含 "正確設置"，顯示為綠色
-    }
-    return line;  // 保留其他文字的顏色或樣式
-  }).join('<br>');  // 用 <br> 來斷行
-}
+      // Handle edit click
+      function handleEditClick(placeUid, orgId, clientId) {
+        const app = publishers.find((p) => p.orgId === orgId).apps[clientId];
+        editingPlace = { ...app.places[placeUid], orgId, clientId, placeUid };
+        toggleDspModal(true);
+      }
 
-
-    // Render DSP list with placeholders for not connected DSPs
-function renderDspList(dspSettingList) {
-  return dspSettingList.map(dsp => `
-    <div class="flex items-center">
-      <span class="${getDspStatusClass(dsp.status)} h-4 w-4 mr-1">●</span>
-<span class="text-sm">${processDspName(dsp.dspName)}</span>
-      <span class="text-xs text-gray-500 ml-1">(${dspStatusLabel(dsp.status)})</span>
-    </div>
-  `).join('');
-}
-
-
-    // Get DSP status class
-    function getDspStatusClass(status) {
-      const classes = {
-        normal: 'text-green-500',
-        not_connected: 'text-gray-500',
-        paused: 'text-yellow-500',
-        abnormal: 'text-red-500'
-      };
-      return classes[status] || 'text-gray-500';
-    }
-
-    // Handle edit click
-    function handleEditClick(placeUid, orgId, clientId) {
-      const app = publishers.find(p => p.orgId === orgId).apps[clientId];
-      editingPlace = { ...app.places[placeUid], orgId, clientId, placeUid };
-      toggleDspModal(true);
-    }
-
-    // Toggle DSP modal visibility
-    function toggleDspModal(show) {
-      const modal = document.getElementById('dspModal');
-      modal.classList.toggle('hidden', !show);  // 顯示或隱藏 modal
-      if (show) {
-        const content = document.getElementById('dspEditContent');
-        content.innerHTML = editingPlace.dspSettingList.map(dsp => `
+      // Toggle DSP modal visibility
+      function toggleDspModal(show) {
+        const modal = document.getElementById("dspModal");
+        modal.classList.toggle("hidden", !show);
+        if (show) {
+          const content = document.getElementById("dspEditContent");
+          content.innerHTML = editingPlace.dspSettingList
+            .map(
+              (dsp) => `
           <div class="mb-2">
             <label class="flex items-center">
-              <input type="checkbox" ${dsp.status !== 'not_connected' ? 'checked' : ''} 
-                    onchange="handleDspChange('${dsp.dspName}')" class="mr-2">
+              <input type="checkbox" ${
+                dsp.status !== "not_connected" ? "checked" : ""
+              } 
+                     onchange="handleDspChange('${dsp.dspName}')" class="mr-2">
               ${processDspName(dsp.dspName)}
               <span class="ml-2 text-sm">(${dspStatusLabel(dsp.status)})</span>
             </label>
           </div>
-        `).join('');
-      }
-    }
-
-    // Handle DSP change
-    function handleDspChange(dspName) {
-      const dsp = editingPlace.dspSettingList.find(d => d.dspName === dspName);
-      if (dsp) {
-        dsp.status = dsp.status === 'not_connected' ? 'normal' : 'not_connected';
-      }
-    }
-
-    // Handle save DSPs
-    function handleSaveDsps() {
-      toggleDspModal(false);  // 關閉 modal 視窗
-
-      if (!editingPlace) return;
-
-      // 這裡您可以實現保存的邏輯，例如將數據發送到後端
-      google.script.run
-        .withSuccessHandler(() => {
-          fetchPublishers();  // 重新加載發布商列表
-        })
-        .withFailureHandler(handleFetchError)
-        .updateDspStatus({
-          placeUid: editingPlace.placeUid,
-          dspSettingList: editingPlace.dspSettingList,
-        });
-    }
-
-    // Process DSP name
-    function processDspName(dspName) {
-      return [...new Set(dspName.match(/[A-Z][A-Z]+/g))].join('');
-    }
-
-    // Get DSP status label
-    function dspStatusLabel(status) {
-      const labels = {
-        normal: '正常',
-        not_connected: '尚未串接',
-        paused: '暫停',
-        abnormal: '連線異常'
-      };
-      return labels[status] || '';
-    }
-
-    // Filter publishers based on criteria
-    function filterPublishers() {
-      const platform = document.getElementById('platform')?.value || '';
-      const placeType = document.getElementById('placeType')?.value || '';
-      const dspStatus = document.getElementById('dspStatus')?.value || '';
-      const showEmptyDsps = document.getElementById('showEmptyDsps')?.value || '';
-      const size = document.getElementById('size')?.value || '';
-      const dspName = document.getElementById('dspName')?.value || '';
-      const request = document.getElementById('request')?.value || '';
-
-      return publishers.map(publisher => {
-        const filteredApps = Object.entries(publisher.apps).reduce((acc, [clientId, app]) => {
-          const filteredPlaces = Object.entries(app.places).filter(([placeUid, place]) => {
-            let shouldInclude = true;
-
-            if (platform && shouldInclude) {
-              shouldInclude = app.platform.toUpperCase() === platform.toUpperCase();
-            }
-
-            if (placeType && shouldInclude) {
-              shouldInclude = place.placeType === placeType;
-            }
-
-            if (size && shouldInclude) {
-              shouldInclude = place.size === size;
-            }
-
-            if (dspName && shouldInclude) {
-              shouldInclude = place.dspSettingList.some(dsp => dsp.dspName === dspName);
-            }
-
-            if (dspStatus && shouldInclude) {
-              shouldInclude = place.dspSettingList.some(dsp => dsp.status === dspStatus);
-            }
-
-            if (showEmptyDsps && shouldInclude) {
-              if (showEmptyDsps === "with") {
-                shouldInclude = place.dspSettingList.length > 0;
-              } else if (showEmptyDsps === "without") {
-                shouldInclude = place.dspSettingList.length === 0;
-              }
-            }
-
-            if (request && shouldInclude) {
-              if (request === '0') {
-                shouldInclude = parseInt(place.request) === 0;
-              } else if (request === 'non-zero') {
-                shouldInclude = parseInt(place.request) > 0;
-              }
-            }
-
-            return shouldInclude;
-          });
-
-          if (Object.keys(filteredPlaces).length > 0) {
-            acc[clientId] = {
-              ...app,
-              places: Object.fromEntries(filteredPlaces),
-            };
-          }
-          return acc;
-        }, {});
-
-        return {
-          ...publisher,
-          apps: filteredApps,
-        };
-      }).filter(publisher => Object.keys(publisher.apps).length > 0);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      fetchPublishers();
-
-      const filterIds = ['platform', 'placeType', 'dspStatus', 'showEmptyDsps', 'size', 'dspName', 'request'];
-      filterIds.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-          element.addEventListener('change', renderPublishers);
+        `
+            )
+            .join("");
         }
-      });
-    });
-  </script>
-</body>
+      }
 
+      // Handle DSP change
+      function handleDspChange(dspName) {
+        const dsp = editingPlace.dspSettingList.find(
+          (d) => d.dspName === dspName
+        );
+        if (dsp) {
+          dsp.status =
+            dsp.status === "not_connected" ? "normal" : "not_connected";
+        }
+      }
+
+      // Handle save DSPs
+      function handleSaveDsps() {
+        toggleDspModal(false);
+        if (!editingPlace) return;
+        google.script.run
+          .withSuccessHandler(() => {
+            fetchPublishers();
+          })
+          .withFailureHandler(handleFetchError)
+          .updateDspStatus({
+            placeUid: editingPlace.placeUid,
+            dspSettingList: editingPlace.dspSettingList,
+          });
+      }
+
+      // Process DSP name
+      function processDspName(dspName) {
+        return [...new Set(dspName.match(/[A-Z][A-Z]+/g))].join("");
+      }
+
+      // Get DSP status label
+      function dspStatusLabel(status) {
+        const labels = {
+          normal: "正常",
+          not_connected: "尚未串接",
+          paused: "暫停",
+          abnormal: "連線異常",
+        };
+        return labels[status] || "";
+      }
+
+      // Filter publishers based on criteria
+      function filterPublishers() {
+        const platform = document.getElementById("platform")?.value || "";
+        const placeType = document.getElementById("placeType")?.value || "";
+        const dspStatus = document.getElementById("dspStatus")?.value || "";
+        const showEmptyDsps =
+          document.getElementById("showEmptyDsps")?.value || "";
+        const size = document.getElementById("size")?.value || "";
+        const dspName = document.getElementById("dspName")?.value || "";
+        const request = document.getElementById("request")?.value || "";
+
+        return publishers
+          .map((publisher) => {
+            const filteredApps = Object.entries(publisher.apps).reduce(
+              (acc, [clientId, app]) => {
+                const filteredPlaces = Object.entries(app.places).filter(
+                  ([placeUid, place]) => {
+                    let shouldInclude = true;
+
+                    if (platform && shouldInclude) {
+                      shouldInclude =
+                        app.platform.toUpperCase() === platform.toUpperCase();
+                    }
+
+                    if (placeType && shouldInclude) {
+                      shouldInclude = place.placeType === placeType;
+                    }
+
+                    if (size && shouldInclude) {
+                      shouldInclude = place.size === size;
+                    }
+
+                    if (dspName && shouldInclude) {
+                      shouldInclude = place.dspSettingList.some(
+                        (dsp) => dsp.dspName === dspName
+                      );
+                    }
+
+                    if (dspStatus && shouldInclude) {
+                      shouldInclude = place.dspSettingList.some(
+                        (dsp) => dsp.status === dspStatus
+                      );
+                    }
+
+                    if (showEmptyDsps && shouldInclude) {
+                      if (showEmptyDsps === "with") {
+                        shouldInclude = place.dspSettingList.length > 0;
+                      } else if (showEmptyDsps === "without") {
+                        shouldInclude = place.dspSettingList.length === 0;
+                      }
+                    }
+
+                    if (request && shouldInclude) {
+                      if (request === "0") {
+                        shouldInclude = parseInt(place.request) === 0;
+                      } else if (request === "non-zero") {
+                        shouldInclude = parseInt(place.request) > 0;
+                      }
+                    }
+
+                    return shouldInclude;
+                  }
+                );
+
+                if (Object.keys(filteredPlaces).length > 0) {
+                  acc[clientId] = {
+                    ...app,
+                    places: Object.fromEntries(filteredPlaces),
+                  };
+                }
+                return acc;
+              },
+              {}
+            );
+
+            return {
+              ...publisher,
+              apps: filteredApps,
+            };
+          })
+          .filter((publisher) => Object.keys(publisher.apps).length > 0);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchPublishers();
+
+        const filterIds = [
+          "platform",
+          "placeType",
+          "dspStatus",
+          "showEmptyDsps",
+          "size",
+          "dspName",
+          "request",
+        ];
+        filterIds.forEach((id) => {
+          const element = document.getElementById(id);
+          if (element) {
+            element.addEventListener("change", renderPublishers);
+          }
+        });
+      });
+    </script>
+  </body>
 </html>
