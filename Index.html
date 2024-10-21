@@ -1,43 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Publisher List</title>
-    <link
-      href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
-  </head>
 
-  <body>
-    <div id="app" class="p-6 bg-gray-100 min-h-screen">
-      <!-- Filters -->
-      <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h2 class="text-xl font-semibold mb-4">篩選</h2>
-        <div
-          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
-        >
-          <select id="platform" class="w-full p-2 border rounded-md bg-white">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Publisher List</title>
+  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div id="app" class="p-6 bg-gray-100 min-h-screen">
+    <!-- Filters -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+      <h2 class="text-xl font-semibold mb-4">篩選</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <select id="platform" class="w-full p-2 border rounded-md bg-white">
             <option value="">請選擇平台</option>
             <option value="IOS">IOS</option>
             <option value="ANDROID">ANDROID</option>
             <option value="WEB">WEB</option>
           </select>
-          <select id="placeType" class="w-full p-2 border rounded-md bg-white">
+        <select id="placeType" class="w-full p-2 border rounded-md bg-white">
             <option value="">請選擇版位類型</option>
             <option value="NATIVE">NATIVE</option>
             <option value="BANNER">BANNER</option>
             <option value="SUPR_AD">SUPR_AD</option>
           </select>
-          <select id="dspStatus" class="w-full p-2 border rounded-md bg-white">
+        <select id="dspStatus" class="w-full p-2 border rounded-md bg-white">
             <option value="">請選擇串接狀態</option>
             <option value="normal">正常</option>
             <option value="abnormal">連線異常</option>
             <option value="not_connected">尚未串接</option>
             <option value="paused">暫停</option>
           </select>
-          <select
+        <select
             id="showEmptyDsps"
             class="w-full p-2 border rounded-md bg-white"
           >
@@ -45,14 +41,14 @@
             <option value="with">有 DSP</option>
             <option value="without">無 DSP</option>
           </select>
-          <select id="size" class="w-full p-2 border rounded-md bg-white">
+        <select id="size" class="w-full p-2 border rounded-md bg-white">
             <option value="">請選擇尺寸</option>
             <option value="320x50">320x50</option>
             <option value="300x250">300x250</option>
             <option value="1200x628">1200x628</option>
             <option value="336x280">336x280</option>
           </select>
-          <select id="dspName" class="w-full p-2 border rounded-md bg-white">
+        <select id="dspName" class="w-full p-2 border rounded-md bg-white">
             <option value="">請選擇 DSP</option>
             <option value="CRITEO">CRITEO</option>
             <option value="SMAATONATIVE">SMAATONATIVE</option>
@@ -60,45 +56,49 @@
             <option value="FREAKOUTBANNER">FREAKOUTBANNER</option>
             <option value="UCFUNNELBANNER">UCFUNNELBANNER</option>
           </select>
-          <select id="request" class="w-full p-2 border rounded-md bg-white">
+        <select id="request" class="w-full p-2 border rounded-md bg-white">
             <option value="">所有 Request</option>
             <option value="0">Request = 0</option>
             <option value="non-zero">Request > 0</option>
           </select>
-        </div>
+        <!-- 新增的 App Name 输入框 -->
+        <input
+      type="text"
+      id="appName"
+      class="w-full p-2 border rounded-md bg-white"
+      placeholder="請輸入 App Name"
+    />
       </div>
+    </div>
 
-      <!-- Publishers List -->
-      <div id="publishersList"></div>
+    <!-- Publishers List -->
+    <div id="publishersList"></div>
 
-      <!-- DSP Edit Modal -->
-      <div
-        id="dspModal"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
-      >
-        <div class="bg-white p-6 rounded-lg">
-          <h2 class="text-xl font-bold mb-4">編輯 DSP</h2>
-          <div id="dspEditContent"></div>
-          <div class="mt-4 flex justify-end">
-            <button
+    <!-- DSP Edit Modal -->
+    <div id="dspModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+      <div class="bg-white p-6 rounded-lg">
+        <h2 class="text-xl font-bold mb-4">編輯 DSP</h2>
+        <div id="dspEditContent"></div>
+        <div class="mt-4 flex justify-end">
+          <button
               id="cancelEdit"
               class="bg-gray-300 text-black px-4 py-2 rounded mr-2"
             >
               取消
             </button>
-            <button
+          <button
               id="saveEdit"
               class="bg-blue-500 text-white px-4 py-2 rounded"
             >
               確定
             </button>
-          </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <script>
-      let publishers = [];
+  <script>
+    let publishers = [];
       let editingPlace = null;
 
       const compatibilityMap = {
@@ -443,11 +443,24 @@
         const size = document.getElementById("size")?.value || "";
         const dspName = document.getElementById("dspName")?.value || "";
         const request = document.getElementById("request")?.value || "";
+        const appNameInput = document.getElementById("appName")?.value.trim().toLowerCase() || "";
 
         return publishers
           .map((publisher) => {
             const filteredApps = Object.entries(publisher.apps).reduce(
               (acc, [clientId, app]) => {
+                let appShouldInclude = true;
+
+                    if (appNameInput) {
+                      appShouldInclude = app.appName
+                        .toLowerCase()
+                        .includes(appNameInput);
+                    }
+
+                    if (!appShouldInclude) {
+                      return acc; // 如果不匹配，跳过此 App
+                    }
+
                 const filteredPlaces = Object.entries(app.places).filter(
                   ([placeUid, place]) => {
                     let shouldInclude = true;
@@ -528,13 +541,34 @@
           "dspName",
           "request",
         ];
+        
         filterIds.forEach((id) => {
           const element = document.getElementById(id);
           if (element) {
             element.addEventListener("change", renderPublishers);
           }
         });
+
+        const appNameInput = document.getElementById("appName");
+        if (appNameInput) {
+          appNameInput.addEventListener("input", renderPublishers);
+        }
+
+        // Add these lines to attach event listeners to the buttons
+        const cancelEditButton = document.getElementById("cancelEdit");
+        const saveEditButton = document.getElementById("saveEdit");
+
+        if (cancelEditButton) {
+          cancelEditButton.addEventListener("click", () => {
+            toggleDspModal(false);
+          });
+        }
+
+        if (saveEditButton) {
+          saveEditButton.addEventListener("click", handleSaveDsps);
+        }
       });
-    </script>
-  </body>
+  </script>
+</body>
+
 </html>

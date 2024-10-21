@@ -1,6 +1,7 @@
 //Code.gs
 var cachedData = null;
 var lastFetchTime = null;
+var manualCookie = "AOTTERBD_SESSION=757418f543a95a889184e798ec5ab66d4fad04e5-lats=1724229220332&sso=PIg4zu/Vdnn/A15vMEimFlVAGliNhoWlVd5FTvtEMRAFpk/VvBGvAetanw8DLATSLexy9pee/t52uNojvoFS2Q==;aotter=eyJ1c2VyIjp7ImlkIjoiNjNkYjRkNDBjOTFiNTUyMmViMjk4YjBkIiwiZW1haWwiOiJpYW4uY2hlbkBhb3R0ZXIubmV0IiwiY3JlYXRlZEF0IjoxNjc1MzE2NTQ0LCJlbWFpbFZlcmlmaWVkIjp0cnVlLCJsZWdhY3lJZCI6bnVsbCwibGVnYWN5U2VxSWQiOjE2NzUzMTY1NDQ3ODI5NzQwMDB9LCJhY2Nlc3NUb2tlbiI6IjJkYjQyZTNkOTM5MDUzMjdmODgyZmYwMDRiZmI4YmEzZjBhNTlmMDQwYzhiN2Y4NGY5MmZmZTIzYTU0ZTQ2MDQiLCJ1ZWEiOm51bGx9; _Secure-1PSID=vlPPgXupFroiSjP1/A02minugZVZDgIG4K; _Secure-1PSIDCC=g.a000mwhavReSVd1vN09AVTswXkPAhyuW7Tgj8-JFhj-FZya9I_l1B6W2gqTIWAtQUTQMkTxoAwACgYKAW0SARISFQHGX2MiC--NJ2PzCzDpJ0m3odxHhxoVAUF8yKr8r49abq8oe4UxCA0t_QCW0076; _Secure-3PSID=AKEyXzUuXI1zywmFmkEBEBHfg6GRkRM9cJ9BiJZxmaR46x5im_krhaPtmL4Jhw8gQsz5uFFkfbc; _Secure-3PSIDCC=sidts-CjEBUFGohzUF6oK3ZMACCk2peoDBDp6djBwJhGc4Lxgu2zOlzbVFeVpXF4q1TYZ5ba6cEAA";
 var SPREADSHEET_ID = '1InVJQMOs2qqoxp1ovFVp_gQQFnzvFR5EKwRsC1xBiBg';
 var AUTHORIZED_USERS = ['ian.chen@aotter.net', 'cjay@aotter.net', 'coki.lu@aotter.net', 'john.chiu@aotter.net', 'phsu@aotter.net', 'robert.hsueh@aotter.net', 'smallmouth@aotter.net', 's6354@hotmail.com'];
 
@@ -221,4 +222,184 @@ const compatibilityMap = {
     return platformMap[placeType][size]; // 返回符合 size 的 DSPs
   }
   return Object.values(platformMap[placeType]).flat(); // 返回所有相關 DSPs
+}
+
+function updateDspStatus(data) {
+  Logger.log('Updating DSP status with data: ' + JSON.stringify(data));
+
+  try {
+    var spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var sheet = spreadsheet.getSheetByName('Sheet1');
+    if (!sheet) throw new Error('在指定的 spreadsheet 中找不到 Sheet1');
+
+    var dataRange = sheet.getDataRange();
+    var dataValues = dataRange.getValues();
+
+    // Normalize headers (trim spaces and convert to lowercase)
+    var headers = dataValues[0].map(function(header) {
+      return header.trim().toLowerCase();
+    });
+
+    // Find the row that matches the placeUid
+    var placeUidIndex = headers.indexOf('place uid');
+    if (placeUidIndex === -1) {
+      throw new Error('找不到 "place uid" 列');
+    }
+
+    var dspNameIndices = {};
+    data.dspSettingList.forEach(function(dsp) {
+      var index = headers.indexOf(dsp.dspName.toLowerCase());
+      if (index !== -1) {
+        dspNameIndices[dsp.dspName] = index;
+      }
+    });
+
+    for (var i = 1; i < dataValues.length; i++) {
+      var row = dataValues[i];
+      if (row[placeUidIndex] == data.placeUid) {
+        data.dspSettingList.forEach(function(dsp) {
+          var colIndex = dspNameIndices[dsp.dspName];
+          if (colIndex !== undefined) {
+            var newValue = '';
+            if (dsp.status === 'normal') {
+              newValue = '✓';
+            } else if (dsp.status === 'paused') {
+              newValue = 'paused';
+            } else if (dsp.status === 'abnormal') {
+              newValue = 'abnormal';
+            } else {
+              newValue = '';
+            }
+            row[colIndex] = newValue;
+          }
+        });
+
+        // Update the row in the sheet
+        var range = sheet.getRange(i + 1, 1, 1, row.length);
+        range.setValues([row]);
+        break;
+      }
+    }
+
+    return true;
+  } catch (error) {
+    Logger.log('Error in updateDspStatus: ' + error.toString());
+    throw new Error('更新 DSP 狀態失敗: ' + error.message);
+  }
+}
+
+function updateReceivedValues() {
+  try {
+    // 打開試算表並訪問 'Sheet1'
+    var spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var sheet = spreadsheet.getSheetByName('Sheet1');
+    if (!sheet) throw new Error('找不到 Sheet1');
+
+    // 從試算表中獲取所有資料
+    var dataRange = sheet.getDataRange();
+    var values = dataRange.getValues();
+
+    // 標準化標題（轉換為小寫）
+    var headers = values[0].map(function(header) {
+      return header.trim().toLowerCase();
+    });
+
+    // 獲取相關欄位的索引
+    var placeIndex = headers.indexOf('place');
+    var platformIndex = headers.indexOf('platform');
+    var appNameIndex = headers.indexOf('app name');
+    var placeTypeIndex = headers.indexOf('place type');
+    var receivedIndex = headers.indexOf('received'); // 我們將在此欄位存儲 'received' 值
+
+    // 如果 'received' 欄位不存在，則新增
+    if (receivedIndex === -1) {
+      sheet.getRange(1, headers.length + 1).setValue('received');
+      receivedIndex = headers.length;
+    }
+
+    // 從第二行開始迭代每一行（i = 1）
+    for (var i = 1; i < values.length; i++) {
+      var row = values[i];
+      var place = row[placeIndex];
+      var platform = row[platformIndex];
+      var appName = row[appNameIndex];
+      var placeType = row[placeTypeIndex];
+
+      // 如果任何必要的欄位缺失，則跳過該行
+      if (!place || !platform || !appName || !placeType) {
+        Logger.log('由於缺少資料，跳過第 ' + (i + 1) + ' 行');
+        continue;
+      }
+
+      // 構建 POST 請求的資料載荷
+      var payload = {
+        "platform": platform,
+        "appName": appName,
+        "placeType": placeType,
+        "place": place,
+        "groupBy": null,
+        "mode": "ALL",
+        "sinceDate": getFormattedDate(-1), // 前一天
+        "toDate": getFormattedDate(-1),    // 前一天
+        "timeSegment": "day"
+      };
+
+      // 輸出請求的載荷
+      Logger.log('第 ' + (i + 1) + ' 行的請求載荷：' + JSON.stringify(payload));
+
+      // 準備請求選項
+      var options = {
+        'method': 'post',
+        'contentType': 'application/json',
+        'headers': {
+          'Cookie': manualCookie,
+          'Accept': 'application/json, text/plain, */*',
+          // 如有必要，添加其他標頭
+        },
+        'payload': JSON.stringify(payload)
+      };
+
+      // 發送 POST 請求
+      var apiUrl = 'https://trek.aotter.net/api/admin/next/bi/request';
+      var response = UrlFetchApp.fetch(apiUrl, options);
+      var responseCode = response.getResponseCode();
+      if (responseCode !== 200) {
+        Logger.log('第 ' + (i + 1) + ' 行的 API 請求失敗，回應碼為 ' + responseCode);
+        Logger.log('回應內容：' + response.getContentText());
+        continue;
+      }
+
+      var contentText = response.getContentText();
+      Logger.log('第 ' + (i + 1) + ' 行的回應內容：' + contentText);
+      var data = JSON.parse(contentText);
+
+      // 檢查回應資料是否包含預期的欄位
+      if (data && data.data && Array.isArray(data.data) && data.data.length > 0) {
+        var firstItem = data.data[0];
+        var received = firstItem.trek && firstItem.trek.received ? firstItem.trek.received : 0;
+
+        // 更新試算表中的 'received' 欄位
+        sheet.getRange(i + 1, receivedIndex + 1).setValue(received);
+        Logger.log('已更新第 ' + (i + 1) + ' 行的 received 值：' + received);
+      } else {
+        Logger.log('第 ' + (i + 1) + ' 行沒有返回資料');
+        // 可選地，您可以將 'received' 儲存格設為 0 或空白
+        sheet.getRange(i + 1, receivedIndex + 1).setValue(0);
+      }
+    }
+  } catch (error) {
+    Logger.log('updateReceivedValues 中的錯誤：' + error.toString());
+    throw new Error('更新 received 值失敗：' + error.message);
+  }
+}
+
+
+// 輔助函數：獲取當前日期偏移指定天數的 'YYYY-MM-DD' 格式日期字串
+function getFormattedDate(offsetDays) {
+  var date = new Date();
+  date.setDate(date.getDate() + offsetDays);
+  var yyyy = date.getFullYear();
+  var mm = ('0' + (date.getMonth() + 1)).slice(-2);
+  var dd = ('0' + date.getDate()).slice(-2);
+  return yyyy + '-' + mm + '-' + dd;
 }
