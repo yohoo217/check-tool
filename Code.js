@@ -3,7 +3,8 @@ var cachedData = null;
 var lastFetchTime = null;
 var manualCookie = "AOTTERBD_SESSION=757418f543a95a889184e798ec5ab66d4fad04e5-lats=1724229220332&sso=PIg4zu/Vdnn/A15vMEimFlVAGliNhoWlVd5FTvtEMRAFpk/VvBGvAetanw8DLATSLexy9pee/t52uNojvoFS2Q==;aotter=eyJ1c2VyIjp7ImlkIjoiNjNkYjRkNDBjOTFiNTUyMmViMjk4YjBkIiwiZW1haWwiOiJpYW4uY2hlbkBhb3R0ZXIubmV0IiwiY3JlYXRlZEF0IjoxNjc1MzE2NTQ0LCJlbWFpbFZlcmlmaWVkIjp0cnVlLCJsZWdhY3lJZCI6bnVsbCwibGVnYWN5U2VxSWQiOjE2NzUzMTY1NDQ3ODI5NzQwMDB9LCJhY2Nlc3NUb2tlbiI6IjJkYjQyZTNkOTM5MDUzMjdmODgyZmYwMDRiZmI4YmEzZjBhNTlmMDQwYzhiN2Y4NGY5MmZmZTIzYTU0ZTQ2MDQiLCJ1ZWEiOm51bGx9; _Secure-1PSID=vlPPgXupFroiSjP1/A02minugZVZDgIG4K; _Secure-1PSIDCC=g.a000mwhavReSVd1vN09AVTswXkPAhyuW7Tgj8-JFhj-FZya9I_l1B6W2gqTIWAtQUTQMkTxoAwACgYKAW0SARISFQHGX2MiC--NJ2PzCzDpJ0m3odxHhxoVAUF8yKr8r49abq8oe4UxCA0t_QCW0076; _Secure-3PSID=AKEyXzUuXI1zywmFmkEBEBHfg6GRkRM9cJ9BiJZxmaR46x5im_krhaPtmL4Jhw8gQsz5uFFkfbc; _Secure-3PSIDCC=sidts-CjEBUFGohzUF6oK3ZMACCk2peoDBDp6djBwJhGc4Lxgu2zOlzbVFeVpXF4q1TYZ5ba6cEAA";
 var SPREADSHEET_ID = '1InVJQMOs2qqoxp1ovFVp_gQQFnzvFR5EKwRsC1xBiBg';
-var AUTHORIZED_USERS = ['ian.chen@aotter.net', 'cjay@aotter.net', 'coki.lu@aotter.net', 'john.chiu@aotter.net', 'phsu@aotter.net', 'robert.hsueh@aotter.net', 'smallmouth@aotter.net', 's6354@hotmail.com'];
+var AUTHORIZED_USERS = ['ian.chen@aotter.net', 'cjay@aotter.net', 'coki.lu@aotter.net', 'john.chiu@aotter.net', 'phsu@aotter.net', 'robert.hsueh@aotter.net', 'smallmouth@aotter.net'];
+
 
 function doGet(e) {
   Logger.log('Authorized Users: ' + JSON.stringify(AUTHORIZED_USERS));
@@ -58,6 +59,7 @@ function checkManualAuth(email) {
   return isAuthorized;
 }
 
+//處理在前端顯示畫面
 function getPublishers() {
   if (cachedData && lastFetchTime && (new Date().getTime() - lastFetchTime < 60000)) {
     return cachedData;
@@ -75,6 +77,20 @@ function getPublishers() {
       return header.trim().toLowerCase();
     });
 
+    var criteoCompareResultIndex = headers.indexOf('criteo 比對結果');
+    var foCompareResultIndex = headers.indexOf('fo 比對結果');
+    var smaatoCompareResultIndex = headers.indexOf('smaato 比對結果');
+
+    if (criteoCompareResultIndex === -1) {
+    throw new Error('找不到 "CRITEO 比對結果" 列');
+    }
+    if (foCompareResultIndex === -1) {
+      throw new Error('找不到 "FO 比對結果" 列');
+    }
+    if (smaatoCompareResultIndex === -1) {
+      throw new Error('找不到 "Smaato 比對結果" 列');
+    }
+
     // Get index for ads.txt status column
     var adsTxtStatusIndex = headers.indexOf('ads.txt 設置狀況');
     if (adsTxtStatusIndex === -1) {
@@ -90,13 +106,13 @@ function getPublishers() {
         return obj;
       }, {});
 
-      var orgId = item['org id'];
-      var clientId = item['client id'];
-      var placeUid = item['place uid'];
+      var orgId = item['orgid'];
+      var clientId = item['clientid'];
+      var placeUid = item['placeuid'];
 
       if (!acc[orgId]) {
         acc[orgId] = {
-          orgName: item['org name'],
+          orgName: item['orgname'],
           orgId: orgId,
           apps: {}
         };
@@ -104,7 +120,7 @@ function getPublishers() {
 
       if (!acc[orgId].apps[clientId]) {
         acc[orgId].apps[clientId] = {
-          appName: item['app name'],
+          appName: item['appname'],
           clientId: clientId,
           platform: item['platform'],
           places: {}
@@ -129,11 +145,7 @@ function getPublishers() {
             var dspStatus = item[dspName].trim().toLowerCase();
             if (dspStatus === '✓' || dspStatus === 'connected') { // 檢查 '✓' 或其他可能的標記
               status = 'normal';
-            } else if (dspStatus === 'paused') {
-              status = 'paused';
-            } else if (dspStatus === 'abnormal') {
-              status = 'abnormal';
-            }
+            } 
           }
 
           return {
@@ -144,23 +156,28 @@ function getPublishers() {
         });
 
         // 根據 compatibilityMap 標註 DSPs 是否兼容，但不過濾
-        const compatibleDsps = getCompatibleDsps(item['platform'], item['place type'], `${item['width']}x${item['height']}`);
+        const compatibleDsps = getCompatibleDsps(item['platform'], item['placetype']);
 
         dspSettingList = dspSettingList.filter(dsp => compatibleDsps.includes(dsp.dspName)); // 只保留兼容的 DSP
 
+        var criteoCompareResult = row[criteoCompareResultIndex] || '';
+        var foCompareResult = row[foCompareResultIndex] || '';
+        var smaatoCompareResult = row[smaatoCompareResultIndex] || '';
+
         acc[orgId].apps[clientId].places[placeUid] = {
           place: item['place'],
-          placeType: item['place type'],
+          placeType: item['placetype'],
           placeUid: placeUid,
-          width: item['width'] || 'N/A',
-          height: item['height'] || 'N/A',
-          size: (item['width'] && item['height']) ? item['width'] + 'x' + item['height'] : 'N/A',
-          request: item['request'] || '0',
+          size: item['size'],
+          request: item['received'] || '0',
           dspSettingList: dspSettingList,
           hasAsealSellerJson: hasAsealSellerJson,
           hasTeadsSellerJson: hasTeadsSellerJson,
           hasUcfunnelSellerJson: hasUcfunnelSellerJson,
-          hasSmaatoSellerJson: hasSmaatoSellerJson
+          hasSmaatoSellerJson: hasSmaatoSellerJson,
+          criteoCompareResult: criteoCompareResult,
+          foCompareResult: foCompareResult,
+          smaatoCompareResult: smaatoCompareResult
         };
       }
       return acc;
@@ -178,7 +195,7 @@ function getPublishers() {
   }
 }
 
-// 定義 getCompatibleDsps 函數
+// 定義 getCompatibleDsps 函數，會在前端顯示符合 size 條件的 DSP
 function getCompatibleDsps(platform, placeType, size) {
 const compatibilityMap = {
   IOS: {
@@ -224,6 +241,7 @@ const compatibilityMap = {
   return Object.values(platformMap[placeType]).flat(); // 返回所有相關 DSPs
 }
 
+//分析從 api 拿到的 dspSetting 值，看 Trek 開發者設定部分有哪些 DSP 已經設定了
 function updateDspStatus(data) {
   Logger.log('Updating DSP status with data: ' + JSON.stringify(data));
 
@@ -241,9 +259,9 @@ function updateDspStatus(data) {
     });
 
     // Find the row that matches the placeUid
-    var placeUidIndex = headers.indexOf('place uid');
+    var placeUidIndex = headers.indexOf('placeuid');
     if (placeUidIndex === -1) {
-      throw new Error('找不到 "place uid" 列');
+      throw new Error('找不到 "placeuid" 列');
     }
 
     var dspNameIndices = {};
@@ -263,10 +281,6 @@ function updateDspStatus(data) {
             var newValue = '';
             if (dsp.status === 'normal') {
               newValue = '✓';
-            } else if (dsp.status === 'paused') {
-              newValue = 'paused';
-            } else if (dsp.status === 'abnormal') {
-              newValue = 'abnormal';
             } else {
               newValue = '';
             }
@@ -288,78 +302,93 @@ function updateDspStatus(data) {
   }
 }
 
+//取得 Trek 每日請求數
+// 全域變數
+var BATCH_SIZE = 100; // 每個批次處理的行數
+
 function updateReceivedValues() {
-  try {
-    // 打開試算表並訪問 'Sheet1'
-    var spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
-    var sheet = spreadsheet.getSheetByName('Sheet1');
-    if (!sheet) throw new Error('找不到 Sheet1');
+  // 初始化 lastProcessedRow
+  var scriptProperties = PropertiesService.getScriptProperties();
+  scriptProperties.setProperty('lastProcessedRow', '1'); // 從第 1 行開始
 
-    // 從試算表中獲取所有資料
-    var dataRange = sheet.getDataRange();
-    var values = dataRange.getValues();
+  // 設置批次處理的觸發器
+  setupBatchTrigger();
+}
 
-    // 標準化標題（轉換為小寫）
-    var headers = values[0].map(function(header) {
-      return header.trim().toLowerCase();
-    });
+// 批次處理函數
+function updateReceivedValuesBatch() {
+  var scriptProperties = PropertiesService.getScriptProperties();
+  var startRow = parseInt(scriptProperties.getProperty('lastProcessedRow')) || 1; // 取得起始行號
 
-    // 獲取相關欄位的索引
-    var placeIndex = headers.indexOf('place');
-    var platformIndex = headers.indexOf('platform');
-    var appNameIndex = headers.indexOf('app name');
-    var placeTypeIndex = headers.indexOf('place type');
-    var receivedIndex = headers.indexOf('received'); // 我們將在此欄位存儲 'received' 值
+  var spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = spreadsheet.getSheetByName('Sheet1');
+  if (!sheet) throw new Error('找不到 Sheet1');
 
-    // 如果 'received' 欄位不存在，則新增
-    if (receivedIndex === -1) {
-      sheet.getRange(1, headers.length + 1).setValue('received');
-      receivedIndex = headers.length;
+  var dataRange = sheet.getDataRange();
+  var values = dataRange.getValues();
+  var numRows = values.length;
+
+  // 計算結束行號
+  var endRow = Math.min(startRow + BATCH_SIZE - 1, numRows - 1);
+
+  // 標準化標題（轉換為小寫）
+  var headers = values[0].map(function(header) {
+    return header.trim().toLowerCase();
+  });
+
+  // 獲取相關欄位的索引
+  var placeIndex = headers.indexOf('place');
+  var platformIndex = headers.indexOf('platform');
+  var appNameIndex = headers.indexOf('appname');
+  var placeTypeIndex = headers.indexOf('placetype');
+  var receivedIndex = headers.indexOf('received'); // 我們將在此欄位存儲 'received' 值
+
+  // 如果 'received' 欄位不存在，則新增
+  if (receivedIndex === -1) {
+    sheet.getRange(1, headers.length + 1).setValue('received');
+    receivedIndex = headers.length;
+  }
+
+  // 從 startRow 到 endRow 迭代每一行
+  for (var i = startRow; i <= endRow; i++) {
+    var row = values[i];
+    var place = row[placeIndex];
+    var platform = row[platformIndex];
+    var appName = row[appNameIndex];
+    var placeType = row[placeTypeIndex];
+
+    // 如果任何必要的欄位缺失，則跳過該行
+    if (!place || !platform || !appName || !placeType) {
+      Logger.log('由於缺少資料，跳過第 ' + (i + 1) + ' 行');
+      continue;
     }
 
-    // 從第二行開始迭代每一行（i = 1）
-    for (var i = 1; i < values.length; i++) {
-      var row = values[i];
-      var place = row[placeIndex];
-      var platform = row[platformIndex];
-      var appName = row[appNameIndex];
-      var placeType = row[placeTypeIndex];
+    // 構建 POST 請求的資料載荷
+    var payload = {
+      "platform": platform,
+      "appName": appName,
+      "placeType": placeType,
+      "place": place,
+      "groupBy": null,
+      "mode": "ALL",
+      "sinceDate": getFormattedDate(-1), // 前一天
+      "toDate": getFormattedDate(-1),    // 前一天
+      "timeSegment": "day"
+    };
 
-      // 如果任何必要的欄位缺失，則跳過該行
-      if (!place || !platform || !appName || !placeType) {
-        Logger.log('由於缺少資料，跳過第 ' + (i + 1) + ' 行');
-        continue;
-      }
+    // 準備請求選項
+    var options = {
+      'method': 'post',
+      'contentType': 'application/json',
+      'headers': {
+        'Cookie': manualCookie,
+        'Accept': 'application/json, text/plain, */*',
+      },
+      'payload': JSON.stringify(payload)
+    };
 
-      // 構建 POST 請求的資料載荷
-      var payload = {
-        "platform": platform,
-        "appName": appName,
-        "placeType": placeType,
-        "place": place,
-        "groupBy": null,
-        "mode": "ALL",
-        "sinceDate": getFormattedDate(-1), // 前一天
-        "toDate": getFormattedDate(-1),    // 前一天
-        "timeSegment": "day"
-      };
-
-      // 輸出請求的載荷
-      Logger.log('第 ' + (i + 1) + ' 行的請求載荷：' + JSON.stringify(payload));
-
-      // 準備請求選項
-      var options = {
-        'method': 'post',
-        'contentType': 'application/json',
-        'headers': {
-          'Cookie': manualCookie,
-          'Accept': 'application/json, text/plain, */*',
-          // 如有必要，添加其他標頭
-        },
-        'payload': JSON.stringify(payload)
-      };
-
-      // 發送 POST 請求
+    // 發送 POST 請求
+    try {
       var apiUrl = 'https://trek.aotter.net/api/admin/next/bi/request';
       var response = UrlFetchApp.fetch(apiUrl, options);
       var responseCode = response.getResponseCode();
@@ -383,14 +412,77 @@ function updateReceivedValues() {
         Logger.log('已更新第 ' + (i + 1) + ' 行的 received 值：' + received);
       } else {
         Logger.log('第 ' + (i + 1) + ' 行沒有返回資料');
-        // 可選地，您可以將 'received' 儲存格設為 0 或空白
         sheet.getRange(i + 1, receivedIndex + 1).setValue(0);
       }
+    } catch (error) {
+      Logger.log('第 ' + (i + 1) + ' 行的請求錯誤：' + error.toString());
     }
-  } catch (error) {
-    Logger.log('updateReceivedValues 中的錯誤：' + error.toString());
-    throw new Error('更新 received 值失敗：' + error.message);
   }
+
+  // 更新已處理的最後一行
+  if (endRow >= numRows - 1) {
+    // 所有行都已處理，刪除屬性和觸發器
+    scriptProperties.deleteProperty('lastProcessedRow');
+    deleteBatchTrigger(); // 刪除觸發器的函數
+    Logger.log('所有行都已處理完成。');
+  } else {
+    // 還有未處理的行，更新 lastProcessedRow
+    scriptProperties.setProperty('lastProcessedRow', (endRow + 1).toString());
+    Logger.log('已處理至第 ' + (endRow + 1) + ' 行。將在下一次觸發器執行時繼續處理。');
+  }
+}
+
+// 設置批次處理的觸發器
+function setupBatchTrigger() {
+  var triggers = ScriptApp.getProjectTriggers();
+  var hasTrigger = triggers.some(function(trigger) {
+    return trigger.getHandlerFunction() === 'updateReceivedValuesBatch';
+  });
+  if (!hasTrigger) {
+    ScriptApp.newTrigger('updateReceivedValuesBatch')
+      .timeBased()
+      .everyMinutes(1)
+      .create();
+    Logger.log('已設置批次處理的觸發器，每分鐘執行一次。');
+  } else {
+    Logger.log('批次處理的觸發器已存在。');
+  }
+}
+
+// 刪除批次處理的觸發器
+function deleteBatchTrigger() {
+  var triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(function(trigger) {
+    if (trigger.getHandlerFunction() === 'updateReceivedValuesBatch') {
+      ScriptApp.deleteTrigger(trigger);
+      Logger.log('已刪除批次處理的觸發器。');
+    }
+  });
+}
+
+
+
+// 設置每日觸發器，將在每天早上 6 點執行 updateReceivedValuesDailyBatch
+function setupDailyTrigger() {
+  const triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(trigger => {
+    ScriptApp.deleteTrigger(trigger);  // 刪除所有已存在的觸發器
+  });
+  
+  console.log('設置每日觸發器 - 設定為每天早上 6 點執行');
+  
+  ScriptApp.newTrigger('updateReceivedValuesDailyBatch')
+    .timeBased()
+    .atHour(6)
+    .everyDays(1)
+    .create();  // 每日早上 6 點執行 updateReceivedValuesDailyBatch
+}
+
+// 輔助函數：獲取 Unix 時間戳記（毫秒）
+function getUnixTime(offsetDays) {
+  var date = new Date();
+  date.setDate(date.getDate() + offsetDays);
+  return date.getTime();
 }
 
 

@@ -8,66 +8,64 @@
   <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
 </head>
 
-<body>
+<body class="text-xs">
   <div id="app" class="p-6 bg-gray-100 min-h-screen">
     <!-- Filters -->
     <div class="bg-white p-6 rounded-lg shadow-md mb-6">
       <h2 class="text-xl font-semibold mb-4">篩選</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         <select id="platform" class="w-full p-2 border rounded-md bg-white">
-            <option value="">請選擇平台</option>
-            <option value="IOS">IOS</option>
-            <option value="ANDROID">ANDROID</option>
-            <option value="WEB">WEB</option>
-          </select>
+          <option value="">請選擇平台</option>
+          <option value="IOS">IOS</option>
+          <option value="ANDROID">ANDROID</option>
+          <option value="WEB">WEB</option>
+        </select>
         <select id="placeType" class="w-full p-2 border rounded-md bg-white">
-            <option value="">請選擇版位類型</option>
-            <option value="NATIVE">NATIVE</option>
-            <option value="BANNER">BANNER</option>
-            <option value="SUPR_AD">SUPR_AD</option>
-          </select>
+          <option value="">請選擇版位類型</option>
+          <option value="NATIVE">NATIVE</option>
+          <option value="BANNER">BANNER</option>
+          <option value="SUPR_AD">SUPR_AD</option>
+        </select>
         <select id="dspStatus" class="w-full p-2 border rounded-md bg-white">
-            <option value="">請選擇串接狀態</option>
-            <option value="normal">正常</option>
-            <option value="abnormal">連線異常</option>
-            <option value="not_connected">尚未串接</option>
-            <option value="paused">暫停</option>
-          </select>
-        <select
-            id="showEmptyDsps"
-            class="w-full p-2 border rounded-md bg-white"
-          >
-            <option value="">請選擇廣告版位</option>
-            <option value="with">有 DSP</option>
-            <option value="without">無 DSP</option>
-          </select>
+          <option value="">請選擇串接狀態</option>
+          <option value="normal">設置</option>
+          <option value="not_connected">未設置</option>
+        </select>
+        <select id="showEmptyDsps" class="w-full p-2 border rounded-md bg-white">
+          <option value="">請選擇廣告版位</option>
+          <option value="with">有 DSP</option>
+          <option value="without">無 DSP</option>
+        </select>
         <select id="size" class="w-full p-2 border rounded-md bg-white">
-            <option value="">請選擇尺寸</option>
-            <option value="320x50">320x50</option>
-            <option value="300x250">300x250</option>
-            <option value="1200x628">1200x628</option>
-            <option value="336x280">336x280</option>
-          </select>
+          <option value="">請選擇尺寸</option>
+          <option value="320x50">320x50</option>
+          <option value="300x250">300x250</option>
+          <option value="1200x628">1200x628</option>
+          <option value="336x280">336x280</option>
+        </select>
         <select id="dspName" class="w-full p-2 border rounded-md bg-white">
-            <option value="">請選擇 DSP</option>
-            <option value="CRITEO">CRITEO</option>
-            <option value="SMAATONATIVE">SMAATONATIVE</option>
-            <option value="UCFUNNELNATIVE">UCFUNNELNATIVE</option>
-            <option value="FREAKOUTBANNER">FREAKOUTBANNER</option>
-            <option value="UCFUNNELBANNER">UCFUNNELBANNER</option>
-          </select>
+          <option value="">請選擇 DSP</option>
+          <option value="CRITEO">CRITEO</option>
+          <option value="SMAATONATIVE">SMAATONATIVE</option>
+          <option value="UCFUNNELNATIVE">UCFUNNELNATIVE</option>
+          <option value="FREAKOUTBANNER">FREAKOUTBANNER</option>
+          <option value="UCFUNNELBANNER">UCFUNNELBANNER</option>
+        </select>
         <select id="request" class="w-full p-2 border rounded-md bg-white">
-            <option value="">所有 Request</option>
-            <option value="0">Request = 0</option>
-            <option value="non-zero">Request > 0</option>
-          </select>
-        <!-- 新增的 App Name 输入框 -->
-        <input
-      type="text"
-      id="appName"
-      class="w-full p-2 border rounded-md bg-white"
-      placeholder="請輸入 App Name"
-    />
+          <option value="">所有 Request</option>
+          <option value="0">Request = 0</option>
+          <option value="non-zero">Request > 10000</option>
+        </select>
+        <select id="dspPlaceSetupStatus" class="w-full p-2 border rounded-md bg-white">
+          <option value="">所有狀況</option>
+          <option value="匹配成功">匹配成功</option>
+          <option value="匹配失敗">匹配失敗</option>
+          <option value="DSP 無設置">DSP 無設置</option>
+          <option value="FREAKOUTVASTXML 匹配">FREAKOUTVASTXML 匹配</option>
+          <option value="FREAKOUTBANNER 匹配">FREAKOUTBANNER 匹配</option>
+          <option value="無資料">無資料</option>
+        </select>
+        <input type="text" id="appName" class="w-full p-2 border rounded-md bg-white" placeholder="請輸入 App Name" />
       </div>
     </div>
 
@@ -80,18 +78,8 @@
         <h2 class="text-xl font-bold mb-4">編輯 DSP</h2>
         <div id="dspEditContent"></div>
         <div class="mt-4 flex justify-end">
-          <button
-              id="cancelEdit"
-              class="bg-gray-300 text-black px-4 py-2 rounded mr-2"
-            >
-              取消
-            </button>
-          <button
-              id="saveEdit"
-              class="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              確定
-            </button>
+          <button id="cancelEdit" class="bg-gray-300 text-black px-4 py-2 rounded mr-2">取消</button>
+          <button id="saveEdit" class="bg-blue-500 text-white px-4 py-2 rounded">確定</button>
         </div>
       </div>
     </div>
@@ -103,7 +91,7 @@
 
       const compatibilityMap = {
         IOS: {
-          NATIVE: ["CRITEO", "SMAATONATIVE", "UCFUNNELNATIVE"],
+          NATIVE: ["CRITEO", "SMAATONATIVE"],
           BANNER: {
             "320x50": ["FREAKOUTBANNER", "UCFUNNELBANNER"],
             "300x250": ["UCFUNNELBANNER"],
@@ -113,7 +101,6 @@
           },
         },
         WEB: {
-          NATIVE: ["UCFUNNELNATIVE"],
           BANNER: {
             "320x50": ["CRITEO", "UCFUNNELBANNER"],
             "300x250": ["CRITEO", "UCFUNNELBANNER"],
@@ -124,7 +111,7 @@
           },
         },
         ANDROID: {
-          NATIVE: ["CRITEO", "SMAATONATIVE", "UCFUNNELNATIVE"],
+          NATIVE: ["CRITEO", "SMAATONATIVE"],
           BANNER: {
             "320x50": ["FREAKOUTBANNER", "UCFUNNELBANNER"],
             "300x250": ["UCFUNNELBANNER"],
@@ -259,24 +246,25 @@
             app.platform
           }</span>
         </div>
-        <table class="w-full bg-white">
-<thead>
-  <tr class="bg-gray-50">
-    <th class="p-2 text-left pl-4">廣告版位</th>
-    <th class="p-2 text-left">版位類型</th>
-    <th class="p-2 text-left">版位 UID</th>
-    <th class="p-2 text-left">尺寸</th>
-    <th class="p-2 text-left">DSP</th>
-    <th class="p-2 text-left">請求數</th>
-    <th class="p-2 text-left">填充率</th>
-    <th class="p-2 text-left">ads.txt 狀態</th>
-    <th class="p-2 text-left">操作</th>
-  </tr>
-</thead>
-          <tbody>
-            ${renderPlaces(app.places, orgId, clientId)}
-          </tbody>
-        </table>
+<table class="w-full bg-white table-fixed">
+  <thead>
+    <tr class="bg-gray-50 text-left">
+      <th class="p-3 pl-4 w-1/5">廣告版位</th>
+      <th class="p-3 w-1/6">版位類型</th>
+      <th class="p-3 w-1/5">版位 UID</th>
+      <th class="p-3 w-1/6">尺寸</th>
+      <th class="p-3 w-1/4">trek 後台 DSP</th>
+      <th class="p-3 w-1/6">各 DSP place 設置狀況</th>
+      <th class="p-3 w-1/6">Trek 前一日請求數</th>
+      <th class="p-3 w-1/6">ads.txt 狀態</th>
+      <th class="p-3 w-1/6">可串接通知/串接異常狀態</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${renderPlaces(app.places, orgId, clientId)}
+  </tbody>
+</table>
+
       `
           )
           .join("");
@@ -293,10 +281,8 @@
           <td class="p-2">${placeUid}</td>
           <td class="p-2">${place.size || "N/A"}</td>
           <td class="p-2">${renderDspList(place.dspSettingList)}</td>
+          <td class="p-2">${renderDspPlaceSetupStatus(place)}</td>
           <td class="p-2">${place.request}</td>
-          <td class="p-2">${place.dspSettingList
-            .map((dsp) => `${(parseFloat(dsp.fillRate) * 100).toFixed(2)}%`)
-            .join("<br>")}</td>
           <td class="p-2">
   ${
     place.hasAsealSellerJson
@@ -320,16 +306,69 @@
   }
 
           </td>
-          <td class="p-2">
-            <button onclick="handleEditClick('${placeUid}', '${orgId}', '${clientId}')" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-              編輯
-            </button>
-          </td>
+          <td class="p-2">${getConnectionStatus(place)}</td>
         </tr>
       `
           )
           .join("");
       }
+
+      // 添加 getConnectionStatus 函數
+function getConnectionStatus(place) {
+  const requestCount = parseInt(place.request, 10) || 0;
+  if (requestCount < 1000) {
+    return '每日請求數過少';
+  }
+
+  // 檢查 trek 後台 DSP 未設置的 DSP
+  const dspSettingList = place.dspSettingList || [];
+  const notConnectedDsps = dspSettingList
+    .filter(dsp => dsp.status === 'not_connected')
+    .map(dsp => dsp.dspName);
+
+  if (notConnectedDsps.length > 0) {
+    return 'trek 後台 DSP 未設置: ' + notConnectedDsps.join(', ');
+  }
+
+  // 檢查各 DSP place 設置狀況未設置的 DSP
+  const dspPlaceSetupResults = [
+    { name: 'CRITEO', result: place.criteoCompareResult },
+    { name: 'FO', result: place.foCompareResult },
+    { name: 'Smaato', result: place.smaatoCompareResult }
+  ];
+
+  const dspPlaceNotSetUp = dspPlaceSetupResults
+    .filter(dsp => {
+      const result = dsp.result || '';
+      return !result || result.includes('匹配失败') || result.includes('未設置');
+    })
+    .map(dsp => dsp.name);
+
+  if (dspPlaceNotSetUp.length > 0) {
+    return 'DSP place 未設置: ' + dspPlaceNotSetUp.join(', ');
+  }
+
+  // 檢查 ads.txt 狀態未設置的 DSP
+  const adsTxtDsps = [
+    { name: 'Aseal', isSetUp: place.hasAsealSellerJson },
+    { name: 'Teads', isSetUp: place.hasTeadsSellerJson },
+    { name: 'Ucfunnel', isSetUp: place.hasUcfunnelSellerJson },
+    { name: 'Smaato', isSetUp: place.hasSmaatoSellerJson }
+  ];
+
+  const adsTxtNotSetUpDsps = adsTxtDsps
+    .filter(dsp => !dsp.isSetUp)
+    .map(dsp => dsp.name);
+
+  if (adsTxtNotSetUpDsps.length > 0) {
+    return 'ads.txt 未設置: ' + adsTxtNotSetUpDsps.join(', ');
+  }
+
+  // 所有設置已完成
+  return '所有設置已完成';
+}
+
+
 
       // Render DSP list
       function renderDspList(dspSettingList) {
@@ -425,13 +464,34 @@
       // Get DSP status label
       function dspStatusLabel(status) {
         const labels = {
-          normal: "正常",
-          not_connected: "尚未串接",
-          paused: "暫停",
-          abnormal: "連線異常",
+          normal: "設置",
+          not_connected: "未設置",
         };
         return labels[status] || "";
       }
+
+      function renderDspPlaceSetupStatus(place) {
+        return `
+          <div><strong>CRITEO:</strong> ${place.criteoCompareResult || '無資料'}</div>
+          <div><strong>FO:</strong> ${place.foCompareResult || '無資料'}</div>
+          <div><strong>Smaato:</strong> ${place.smaatoCompareResult || '無資料'}</div>
+        `;
+      }
+
+      function renderDspPlaceSetupStatus(place) {
+        function getStatusClass(result) {
+          if (result.includes('匹配失敗')) return 'text-red-500';
+          if (result.includes('匹配成功')) return 'text-green-500';
+          return 'text-gray-500';
+        }
+
+        return `
+          <div class="${getStatusClass(place.criteoCompareResult)}"><strong>CRITEO:</strong> ${place.criteoCompareResult || '無資料'}</div>
+          <div class="${getStatusClass(place.foCompareResult)}"><strong>FO:</strong> ${place.foCompareResult || '無資料'}</div>
+          <div class="${getStatusClass(place.smaatoCompareResult)}"><strong>Smaato:</strong> ${place.smaatoCompareResult || '無資料'}</div>
+        `;
+      }
+
 
       // Filter publishers based on criteria
       function filterPublishers() {
@@ -444,6 +504,7 @@
         const dspName = document.getElementById("dspName")?.value || "";
         const request = document.getElementById("request")?.value || "";
         const appNameInput = document.getElementById("appName")?.value.trim().toLowerCase() || "";
+        const dspPlaceSetupStatus = document.getElementById("dspPlaceSetupStatus")?.value || "";
 
         return publishers
           .map((publisher) => {
@@ -458,7 +519,7 @@
                     }
 
                     if (!appShouldInclude) {
-                      return acc; // 如果不匹配，跳过此 App
+                      return acc; // 如果不匹配，跳過此 App
                     }
 
                 const filteredPlaces = Object.entries(app.places).filter(
@@ -498,11 +559,26 @@
                       }
                     }
 
+                    if (dspPlaceSetupStatus && shouldInclude) {
+                      // 检查 place 的 DSP 比对结果中是否包含所选的状态
+                      const compareResults = [
+                        place.criteoCompareResult,
+                        place.foCompareResult,
+                        place.smaatoCompareResult
+                      ];
+
+                      if (dspPlaceSetupStatus === "無資料") {
+                        shouldInclude = compareResults.every(result => !result || result.trim() === "");
+                      } else {
+                        shouldInclude = compareResults.some(result => result && result.includes(dspPlaceSetupStatus));
+                      }
+                    }
+
                     if (request && shouldInclude) {
                       if (request === "0") {
                         shouldInclude = parseInt(place.request) === 0;
                       } else if (request === "non-zero") {
-                        shouldInclude = parseInt(place.request) > 0;
+                        shouldInclude = parseInt(place.request) > 10000;
                       }
                     }
 
@@ -540,6 +616,7 @@
           "size",
           "dspName",
           "request",
+          "dspPlaceSetupStatus", // 新增的篩選 ID 功能
         ];
         
         filterIds.forEach((id) => {
@@ -570,5 +647,4 @@
       });
   </script>
 </body>
-
 </html>
